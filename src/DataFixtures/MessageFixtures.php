@@ -6,6 +6,8 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use App\Entity\User;
 use App\Entity\Message;
+use App\Entity\Forum;
+
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class MessageFixtures extends Fixture implements DependentFixtureInterface
@@ -24,6 +26,8 @@ class MessageFixtures extends Fixture implements DependentFixtureInterface
             $message->setContenu($this->faker->paragraph());
             $message->setUser($this->getReference('user'.mt_rand(0,9), User::class));           
              $manager->persist($message);
+            $message->setForum($this->getReference('forum'.mt_rand(0,3), Forum::class));           
+             $manager->persist($message);
             $this->addReference('message' . $i, $message);
         }
         for ($i = 0; $i < 20; $i++) {
@@ -32,8 +36,10 @@ class MessageFixtures extends Fixture implements DependentFixtureInterface
             $message->setDatePoste($this->faker->dateTimeThisYear());
             $message->setContenu($this->faker->paragraph());
             $message->setUser($this->getReference('user' . mt_rand(0, 9), User::class));
+            $message->setForum($this->getReference('forum' . mt_rand(0, 3), Forum::class));
             $message->setParent($this->getReference('message' . mt_rand(0, 9),Message::class));
             $manager->persist($message);
+            $this->addReference('message' . ($i+10), $message);
         }
         $manager->flush();
     }
@@ -41,6 +47,7 @@ class MessageFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             UserFixtures::class,
+            ForumFixtures::class,
         ];
     }
 }

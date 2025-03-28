@@ -61,6 +61,10 @@ class Message
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     private Collection $messages;
 
+    #[ORM\ManyToOne(inversedBy: 'messages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Forum $forum = null;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -157,6 +161,18 @@ class Message
                 $message->setParent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getForum(): ?Forum
+    {
+        return $this->forum;
+    }
+
+    public function setForum(?Forum $forum): static
+    {
+        $this->forum = $forum;
 
         return $this;
     }

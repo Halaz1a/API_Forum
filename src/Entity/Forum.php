@@ -16,12 +16,12 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 
-#[ApiResource(paginationItemsPerPage: 5,operations: [
+#[ApiResource(operations: [
     new GetCollection(normalizationContext: ['groups' => 'forum:list']),
-    new Post(),
+    new Post(security: "is_granted('ROLE_ADMIN')"),
     new Get(),
-    new Patch(),
-    new Delete(),
+    new Patch(security: "is_granted('ROLE_ADMIN')"),
+    new Delete(security: "is_granted('ROLE_ADMIN')"),
     ],)]
     #[ApiFilter(OrderFilter::class, properties: ['nom' => 'ASC'])]
 #[ORM\Entity(repositoryClass: ForumRepository::class)]

@@ -31,7 +31,14 @@ use App\Controller\MessageController;
         name: 'get_root_messages_by_forum',
         uriTemplate: '/messages/forum/{forumId}/roots',
         controller: MessageController::class . '::getRootMessagesByForum',
-        description: 'Récupère tous les messages racines dun forum'
+        description: 'get root messages (no parents) from a forum'
+    ),
+    new GetCollection(
+        normalizationContext: ['groups' => 'message:list'],
+        name: 'get_responses_to_message',
+        uriTemplate: '/messages/id/{messageId}/responses',
+        controller: MessageController::class . '::getResponsesToMessage',
+        description : 'get direct responses to a message'
     )
     ],)]
 #[ApiFilter(SearchFilter::class, properties: ['user' => 'exact'])]
@@ -70,10 +77,12 @@ class Message
      * @var Collection<int, self>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
+    #[Groups(['message:item'])]
     private Collection $messages;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Gropus(['message:item', 'message;list'])]
     private ?Forum $forum = null;
 
     public function __construct()

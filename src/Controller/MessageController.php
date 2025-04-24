@@ -30,6 +30,24 @@ class MessageController extends AbstractController
         
         return $this->json($messages);
     }
+
+    public function getResponsesToMessage(Request $request, EntityManagerInterface $entityManager, string $messageId)
+    {
+        $messageIdInt = (int) $messageId;
+
+        $message = $entityManager->getRepository(Message::class)->find($messageIdInt);
+
+        if (!$message) {
+            return new JsonResponse(['error' => 'Message not found'], 400);
+        }
+
+        $repository = $entityManager->getRepository(Message::class);
+        $messages = $repository->findBy([
+            'parent' => $message
+        ]);
+
+        return $this->json($messages);
+    }
 }
 
 ?>

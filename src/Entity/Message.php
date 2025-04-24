@@ -34,7 +34,7 @@ use App\Controller\MessageController;
     )
     ],)]
 #[ApiFilter(SearchFilter::class, properties: ['user' => 'exact'])]
-#[ApiFilter(OrderFilter::class, properties: ['id' => 'ASC', 'titre' => 'DESC'])]
+#[ApiFilter(OrderFilter::class, properties: ['datePoste' => 'DESC', 'titre' => 'ASC'])]
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 class Message
 {

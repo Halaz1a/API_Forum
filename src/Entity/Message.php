@@ -27,6 +27,7 @@ use App\Controller\MessageController;
     new Patch(security: "is_granted('ROLE_ADMIN') or object == user"),
     new Delete(security: "is_granted('ROLE_ADMIN') or object == user"),
     new GetCollection(
+        normalizationContext: ['groups' => 'message:list'],
         name: 'get_root_messages_by_forum',
         uriTemplate: '/messages/forum/{forumId}/roots',
         controller: MessageController::class . '::getRootMessagesByForum',

@@ -15,13 +15,23 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use App\Controller\MessageController;
+
 
 #[ApiResource(paginationItemsPerPage: 5,operations: [
     new GetCollection(normalizationContext: ['groups' => 'message:list']),
-    new Post(),
+    new Post(security: "is_granted('ROLE_ADMIN') or object == user"),
     new Get(normalizationContext: ['groups' => 'message:item']),
-    new Patch(),
-    new Delete(),
+    new Patch(security: "is_granted('ROLE_ADMIN') or object == user"),
+    new Delete(security: "is_granted('ROLE_ADMIN') or object == user"),
+    new GetCollection(
+        name: 'get_root_messages_by_forum',
+        uriTemplate: '/messages/forum/{forumId}/roots',
+        controller: MessageController::class . '::getRootMessagesByForum',
+        description: 'Récupère tous les messages racines dun forum'
+    )
     ],)]
 #[ApiFilter(SearchFilter::class, properties: ['user' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['id' => 'ASC', 'titre' => 'DESC'])]

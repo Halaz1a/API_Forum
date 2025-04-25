@@ -67,22 +67,54 @@ class MessageController extends AbstractController
         ]);
     }
 
-    public function getResponsesToMessage(Request $request, EntityManagerInterface $entityManager, string $messageId)
-    {
-        $messageIdInt = (int) $messageId;
-
-        $message = $entityManager->getRepository(Message::class)->find($messageIdInt);
-
+    public function getResponsesToMessage(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer,
+        string $messageId
+    ): JsonResponse {
+        $message = $entityManager->getRepository(Message::class)->find((int) $messageId);
+    
         if (!$message) {
-            return new JsonResponse(['error' => 'Message not found'], 400);
+            throw new NotFoundHttpException('Source message not found');
         }
-
-        $repository = $entityManager->getRepository(Message::class);
-        $messages = $repository->findBy([
-            'parent' => $message
+    
+        $page = max((int) $request->query->get('page', 1), 1);
+        $itemsPerPage = (int) $request->query->get('itemsPerPage', 10);
+        $firstResult = ($page - 1) * $itemsPerPage;
+    
+        $qb = $entityManager->getRepository(Message::class)
+            ->createQueryBuilder('m')
+            ->where('m.parent = :messageId')
+            ->setParameter('messageId', $messageId)
+            ->setFirstResult($firstResult)
+            ->setMaxResults($itemsPerPage);
+    
+        $paginator = new DoctrinePaginator($qb);
+        $totalItems = count($paginator);
+    
+        $messages = iterator_to_array($paginator);
+        $jsonMessages = json_decode($serializer->serialize($messages, 'json', [
+            'groups' => ['message:list'],
+        ]), true);
+    
+        $uri = $request->getSchemeAndHttpHost() . $request->getPathInfo();
+    
+        return new JsonResponse([
+            '@context' => '/forum/api/contexts/Message',
+            '@id' => $uri,
+            '@type' => 'hydra:Collection',
+            'hydra:member' => $jsonMessages,
+            'hydra:totalItems' => $totalItems,
+            'hydra:view' => [
+                '@id' => $uri . '?page=' . $page,
+                '@type' => 'hydra:PartialCollectionView',
+                'hydra:first' => $uri . '?page=1',
+                'hydra:last' => $uri . '?page=' . ceil($totalItems / $itemsPerPage),
+                'hydra:next' => $page * $itemsPerPage < $totalItems ? $uri . '?page=' . ($page + 1) : null,
+                'hydra:previous' => $page > 1 ? $uri . '?page=' . ($page - 1) : null,
+            ],
         ]);
-
-        return $this->json($messages);
     }
 }
 

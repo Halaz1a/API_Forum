@@ -20,7 +20,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Controller\MessageController;
 
 
-#[ApiResource(paginationItemsPerPage: 5,operations: [
+#[ApiResource(operations: [
     new GetCollection(normalizationContext: ['groups' => 'message:list']),
     new Post(security: "is_granted('ROLE_ADMIN') or object == user"),
     new Get(normalizationContext: ['groups' => 'message:item']),

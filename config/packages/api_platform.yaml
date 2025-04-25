@@ -15,5 +15,6 @@ api_platform:
                 name: Authorization
                 type: header
     formats:
-        json:
-            mime_types: ['application/json']
+       
+        json: ['application/json']
+        jsonld: ['application/ld+json']

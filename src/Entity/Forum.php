@@ -30,7 +30,7 @@ class Forum
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['forum:list'])]
+    #[Groups(['forum:list', 'message:list', 'message:item'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]

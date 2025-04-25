@@ -82,7 +82,7 @@ class Message
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Gropus(['message:item', 'message;list'])]
+    #[Groups(['message:item', 'message:list'])]
     private ?Forum $forum = null;
 
     public function __construct()

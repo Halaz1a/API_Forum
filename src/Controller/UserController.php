@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserController extends AbstractController
 {
+    #[Route('/users/email/{email}', name: 'get_user_by_email', methods: ['GET'])]
     public function getUserByEmail(string $email, EntityManagerInterface $em): JsonResponse
     {
         $user = $em->getRepository(User::class)->findOneBy(['email' => $email]);

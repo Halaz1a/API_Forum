@@ -2,31 +2,31 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
+use App\State\UserStateProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use App\State\UserStateProcessor;
 
 #[ApiResource(operations: [
-    new GetCollection(normalizationContext: ['groups' => 'user:list']),
-    new Post(processor: UserStateProcessor::class),
-    new Get(normalizationContext: ['groups' => 'user:item']),
-    new Patch(security: "is_granted('ROLE_ADMIN') or object == user", normalizationContext: ['groups' => 'user:edit']),
-    new Delete(),
-    ],)]
+        new GetCollection(normalizationContext: ['groups' => 'user:list']),
+        new Post(processor: UserStateProcessor::class),
+        new Get(normalizationContext: ['groups' => 'user:item']),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object == user", normalizationContext: ['groups' => 'user:edit']),
+        new Delete(),
+    ], )]
 #[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'nom' => 'exact', 'prenom' => 'partial'])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -39,7 +39,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['user:item', 'user:edit'])]
+    #[Groups(['user:list', 'user:item', 'user:edit'])]
     private ?string $email = null;
 
     /**
@@ -56,11 +56,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 30)]
-    #[Groups(['user:list', 'user:item','message:list', 'message:item', 'user:edit'])]
+    #[Groups(['user:list', 'user:item', 'message:list', 'message:item', 'user:edit'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 30)]
-    #[Groups(['user:list', 'user:item','message:list', 'message:item', 'user:edit'])]
+    #[Groups(['user:list', 'user:item', 'message:list', 'message:item', 'user:edit'])]
     private ?string $prenom = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -69,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Message>
      */
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity : Message::class, mappedBy: 'user')]
     private Collection $messages;
 
     public function __construct()

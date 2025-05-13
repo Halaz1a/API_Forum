@@ -22,7 +22,7 @@ use App\Controller\MessageController;
 
 #[ApiResource(operations: [
     new GetCollection(normalizationContext: ['groups' => 'message:list']),
-    new Post(security: "is_granted('ROLE_ADMIN') or object == user"),
+    new Post(security: "is_granted('ROLE_USER')"),
     new Get(normalizationContext: ['groups' => 'message:item']),
     new Patch(security: "is_granted('ROLE_ADMIN') or object == user"),
     new Delete(security: "is_granted('ROLE_ADMIN') or object == user"),
